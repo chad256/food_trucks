@@ -1,103 +1,50 @@
 defmodule FoodTrucks.FoodTruck do
-  import FoodTrucks.Utilities, only: [to_datetime: 1]
+  use Ecto.Schema
+  alias FoodTrucks.FoodTruck
 
-  @food_trucks_endpoint "https://data.sfgov.org/api/views/rqzj-sfat/rows.csv"
+  @params [:location_id, :applicant, :facility_type, :cnn, :location_description, :address, :blocklot, :block, :lot, :permit, :status, :food_items, :x, :y, :latitude, :longitude, :schedule, :dayshours, :noisent, :approved, :received, :prior_permit, :expiration_date, :location, :fire_prevention_districts, :police_districts, :supervisor_districts, :zip_codes, :neighborhoods]
 
-
-  def import_data do
-    fetch_data()
-    |> parse_response()
-    |> process_data()
+  schema "food_trucks" do
+    field :location_id, :integer
+    field :applicant, :string
+    field :facility_type, :string
+    field :cnn, :integer
+    field :location_description, :string
+    field :address, :string
+    field :blocklot, :integer
+    field :block, :integer
+    field :lot, :integer
+    field :permit, :string
+    field :status, :string
+    field :food_items, :string
+    field :x, :decimal
+    field :y, :decimal
+    field :latitude, :decimal
+    field :longitude, :decimal
+    field :schedule, :string
+    field :dayshours, :string
+    field :noisent, :string
+    field :approved, :utc_datetime
+    field :received, :string
+    field :prior_permit, :integer
+    field :expiration_date, :utc_datetime
+    field :location, :string
+    field :fire_prevention_districts, :string
+    field :police_districts, :string
+    field :supervisor_districts, :string
+    field :zip_codes, :integer
+    field :neighborhoods, :string
   end
 
-  def fetch_data do
-    case HTTPoison.get(@food_trucks_endpoint) do
-      {:ok, %HTTPoison.Response{status_code: 200, body: body}} ->
-        body
-      {:ok, %HTTPoison.Response{status_code: 404}} ->
-        {:error, "Not Found"}
-      {:error, %HTTPoison.Error{reason: reason}} ->
-        {:error, reason}
-    end
+  def insert(params) do
+    %FoodTruck{}
+    |> changeset(params)
+    |> FoodTrucks.Repo.insert()
   end
 
-  def parse_response({:error, reason}), do: {:error, reason}
-
-  def parse_response(response) do
-    response
-    |> CSV.decode
-    |> Enum.map(fn {:ok, data} -> data end)
-    |> Enum.filter(fn
-      ["locationid"|_] -> false
-      _ -> true
-    end)
-  end
-
-  def process_data(data) do
-    data
-    |> Enum.map(&process_data_maps(&1))
-  end
-
-  def process_data_maps(data) do
-    [location_id,
-      applicant,
-      facility_type,
-      cnn,
-      location_description,
-      address,
-      blocklot,
-      block,
-      lot,
-      permit,
-      status,
-      food_items,
-      x,
-      y,
-      latitude,
-      longitude,
-      schedule,
-      dayshours,
-      noisent,
-      approved,
-      received,
-      prior_permit,
-      expiration_date,
-      location,
-      fire_prevention_districts,
-      police_districts,
-      supervisor_districts,
-      zip_codes,
-      neighborhoods] = data
-    %{
-      location_id: location_id,
-      applicant: applicant,
-      facility_type: facility_type,
-      cnn: cnn,
-      location_description: location_description,
-      address: address,
-      blocklot: blocklot,
-      block: block,
-      lot: lot,
-      permit: permit,
-      status: status,
-      food_items: food_items,
-      x: x,
-      y: y,
-      latitude: latitude,
-      longitude: longitude,
-      schedule: schedule,
-      dayshours: dayshours,
-      noisent: noisent,
-      approved: to_datetime(approved),
-      received: received,
-      prior_permit: prior_permit,
-      expiration_date: to_datetime(expiration_date),
-      location: location,
-      fire_prevention_districts: fire_prevention_districts,
-      police_districts: police_districts,
-      supervisor_districts: supervisor_districts,
-      zip_codes: zip_codes,
-      neighborhoods: neighborhoods
-    }
+  def changeset(food_truck, params \\ %{}) do
+    food_truck
+    |> Ecto.Changeset.cast(params, @params)
+    |> Ecto.Changeset.unique_constraint(:unique_applicant_at_location, name: :unique_applicant_at_location)
   end
 end
