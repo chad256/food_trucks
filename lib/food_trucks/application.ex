@@ -15,9 +15,8 @@ defmodule FoodTrucks.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: FoodTrucks.PubSub},
       # Start the Endpoint (http/https)
-      FoodTrucksWeb.Endpoint
-      # Start a worker by calling: FoodTrucks.Worker.start_link(arg)
-      # {FoodTrucks.Worker, arg}
+      FoodTrucksWeb.Endpoint,
+      FoodTrucks.DataImporter
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
