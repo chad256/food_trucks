@@ -1,19 +1,7 @@
 # FoodTrucks
 
-To start your Phoenix server:
+This Food Trucks application fetches data from the San Francisco food truck open data set and stores it in a Postgres database.
 
-  * Install dependencies with `mix deps.get`
-  * Create and migrate your database with `mix ecto.setup`
-  * Start Phoenix endpoint with `mix phx.server` or inside IEx with `iex -S mix phx.server`
+The FoodTrucks.DataImporter worker periodically makes requests to the endpoint to keep the database up to date.
 
-Now you can visit [`localhost:4000`](http://localhost:4000) from your browser.
-
-Ready to run in production? Please [check our deployment guides](https://hexdocs.pm/phoenix/deployment.html).
-
-## Learn more
-
-  * Official website: https://www.phoenixframework.org/
-  * Guides: https://hexdocs.pm/phoenix/overview.html
-  * Docs: https://hexdocs.pm/phoenix
-  * Forum: https://elixirforum.com/c/phoenix-forum
-  * Source: https://github.com/phoenixframework/phoenix
+If I had more time I would design an API to expose the data along with more robust testing.
