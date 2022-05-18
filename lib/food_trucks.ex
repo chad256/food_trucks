@@ -25,6 +25,14 @@ defmodule FoodTrucks do
 
   def parse_response({:error, reason}), do: {:error, reason}
 
+  def parse_response(response) when is_binary(response) do
+    response
+    |> StringIO.open()
+    |> (fn {:ok, pid} -> pid end).()
+    |> IO.binstream(:line)
+    |> parse_response()
+  end
+
   def parse_response(response) do
     response
     |> CSV.decode
